@@ -5,6 +5,7 @@ const Earth = () => {
   const geometrical = new THREE.SphereGeometry(15, 60, 30)
   const material = new THREE.MeshStandardMaterial({ map: earthTexture })
   const earth = new THREE.Mesh(geometrical, material)
+  earth.castShadow = true
 
   return earth
 }

@@ -1,0 +1,14 @@
+import * as THREE from '../node_modules/three/build/three.module.js';
+
+const Planets = (name, geometria, positon) => {
+  const PlanetsTexture = new THREE.TextureLoader().load(`./images/${name}.jpg`)
+  const geometrical = new THREE.SphereGeometry(...geometria)
+  const material = new THREE.MeshStandardMaterial({ map: PlanetsTexture })
+  const Planets = new THREE.Mesh(geometrical, material)
+  Planets.castShadow = false
+  Planets.position.x = positon
+
+  return Planets
+}
+
+export default Planets
