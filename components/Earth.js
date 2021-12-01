@@ -1,4 +1,4 @@
-import * as THREE from '../node_modules/three/build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.135.0';
 
 const Earth = () => {
   const earthTexture = new THREE.TextureLoader().load('./images/earth.jpg')
