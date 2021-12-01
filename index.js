@@ -1,8 +1,8 @@
-import * as THREE from 'three/build/three.module.js';
+import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { PCFSoftShadowMap } from 'three/build/three.module.js';
+import { PCFSoftShadowMap } from 'three';
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
 import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
 import Sun from './components/Sum.js';
