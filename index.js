@@ -59,9 +59,8 @@ const SaturnComponent = Planets('saturn', [18, 60, 30], -300)
 scene.add(SaturnComponent)
 
 // Saturn_Ring 
-const textureRing = new THREE.TextureLoader().load('./images/saturn_ring.png')
 const SaturnShape = new THREE.TorusGeometry(30, 5, 2, 100)
-const material = new THREE.MeshStandardMaterial({ map: textureRing })
+const material = new THREE.MeshStandardMaterial({ color: 0xE6BB7D })
 const saturnRing = new THREE.Mesh(SaturnShape, material)
 saturnRing.rotation.x = 90
 saturnRing.position.x = -300
