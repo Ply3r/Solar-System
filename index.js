@@ -105,7 +105,7 @@ function animate() {
   
   MercuryComponent.rotation.y += 0.009
   VenusComponent.rotation.y += 0.0005
-  // EarthComponent.rotation.y += 0.001
+  EarthComponent.rotation.y += 0.001
   MarsComponent.rotation.y += 0.001
   JupiterComponent.rotation.y += 0.005
   SaturnComponent.rotation.y += 0.005
