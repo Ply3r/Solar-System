@@ -58,7 +58,7 @@ scene.add(JupiterComponent)
 const SaturnComponent = Planets('saturn', [18, 60, 30], -300)
 scene.add(SaturnComponent)
 
-// Saturn Ring
+// Saturn_Ring
 const textureRing = new THREE.TextureLoader().load('./images/saturn_ring.png')
 const SaturnShape = new THREE.TorusGeometry(30, 5, 2, 100)
 const material = new THREE.MeshStandardMaterial({ map: textureRing })
