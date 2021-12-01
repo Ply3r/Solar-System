@@ -1,7 +1,7 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.135.0';
 
 const Sun = () => {
-  const sunTexture = new THREE.TextureLoader().load('../images/sun.png')
+  const sunTexture = new THREE.TextureLoader().load('./images/sun.png')
   const geometrical = new THREE.SphereGeometry(60, 60, 30)
   const material = new THREE.MeshBasicMaterial({ map: sunTexture })
   const sun = new THREE.Mesh(geometrical, material)
