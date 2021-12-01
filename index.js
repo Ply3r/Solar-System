@@ -1,10 +1,10 @@
-import * as THREE from 'three/build/three.module.js';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
-import { PCFSoftShadowMap } from 'three/build/three.module.js';
-import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
-import { LuminosityShader } from 'three/examples/jsm/shaders/LuminosityShader.js';
+import * as THREE from './node_modules/three/build/three.module.js';
+import { OrbitControls } from './node_modules/three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from './node_modules/three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from './node_modules/three/examples/jsm/postprocessing/RenderPass.js';
+import { PCFSoftShadowMap } from './node_modules/three/build/three.module.js';
+import { ShaderPass } from './node_modules/three/examples/jsm/postprocessing/ShaderPass.js';
+import { LuminosityShader } from './node_modules/three/examples/jsm/shaders/LuminosityShader.js';
 import Sun from './components/Sum.js';
 import Earth from './components/Earth.js';
 import Moon from './components/Moon.js';
