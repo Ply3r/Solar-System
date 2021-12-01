@@ -7,8 +7,8 @@ const Sun = () => {
   const sun = new THREE.Mesh(geometrical, material)
   sun.position.x = 700
 
-  const sunLight = new THREE.PointLight(0xffffff, 2, 100)
-  sunLight.position.set(70, 5, 5)
+  const sunLight = new THREE.PointLight(0xffffff, 1, 0, 2)
+  sunLight.position.set(700, 5, 5)
 
   return [sun, sunLight]
 }
