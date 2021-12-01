@@ -1,10 +1,10 @@
-import * as THREE from '/node_modules/three/build/three.module.js';
-import { OrbitControls } from '/node_modules/three/examples/jsm/controls/OrbitControls.js';
-import { EffectComposer } from '/node_modules/three/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from '/node_modules/three/examples/jsm/postprocessing/RenderPass.js';
-import { PCFSoftShadowMap } from '/node_modules/three/build/three.module.js';
-import { ShaderPass } from '/node_modules/three/examples/jsm/postprocessing/ShaderPass.js';
-import { LuminosityShader } from '/node_modules/three/examples/jsm/shaders/LuminosityShader.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.135.0';
+import { OrbitControls } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/RenderPass.js';
+import { PCFSoftShadowMap } from 'https://cdn.skypack.dev/three@0.135.0/build/three.module.js';
+import { ShaderPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/ShaderPass.js';
+import { LuminosityShader } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/shaders/LuminosityShader.js';
 import Sun from './components/Sum.js';
 import Earth from './components/Earth.js';
 import Moon from './components/Moon.js';
@@ -78,9 +78,6 @@ scene.add(NeptuneComponent)
 // Ambient Light
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.1)
 scene.add(ambientLight)
-
-const gridHelper = new THREE.GridHelper(1000, 50)
-// scene.add(gridHelper)
 
 const controls = new OrbitControls(camera, renderer.domElement)
 
