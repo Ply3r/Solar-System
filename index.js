@@ -4,8 +4,7 @@ import { EffectComposer } from 'https://cdn.skypack.dev/three@0.135.0/examples/j
 import { RenderPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/RenderPass.js';
 import { PCFSoftShadowMap } from 'https://cdn.skypack.dev/three@0.135.0/build/three.module.js';
 import { ShaderPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/ShaderPass.js';
-import { GlitchPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/GlitchPass.js';
-import { LuminosityShader } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/shaders/LuminosityShader.js';
+import { FXAAShader } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/shaders/FXAAShader.js';
 import Sun from './components/Sum.js';
 import Earth from './components/Earth.js';
 import Moon from './components/Moon.js';
@@ -24,11 +23,10 @@ renderer.shadowMap.type = PCFSoftShadowMap
 // Post-Processing Effects 
 const composer = new EffectComposer( renderer )
 const renderPass = new RenderPass(scene, camera)
-const shaders = new ShaderPass(LuminosityShader)
+const fxaa = new ShaderPass(FXAAShader)
 
-const glitchPass = new GlitchPass();
-
-composer.addPass(renderPass, shaders)
+composer.addPass(renderPass)
+composer.addPass(fxaa)
 
 // Sun
 const SunComponent = Sun()
