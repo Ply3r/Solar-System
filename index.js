@@ -4,6 +4,7 @@ import { EffectComposer } from 'https://cdn.skypack.dev/three@0.135.0/examples/j
 import { RenderPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/RenderPass.js';
 import { PCFSoftShadowMap } from 'https://cdn.skypack.dev/three@0.135.0/build/three.module.js';
 import { ShaderPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/ShaderPass.js';
+import { GlitchPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/GlitchPass.js';
 import { LuminosityShader } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/shaders/LuminosityShader.js';
 import Sun from './components/Sum.js';
 import Earth from './components/Earth.js';
@@ -24,6 +25,9 @@ renderer.shadowMap.type = PCFSoftShadowMap
 const composer = new EffectComposer( renderer )
 const renderPass = new RenderPass(scene, camera)
 const shaders = new ShaderPass(LuminosityShader)
+
+const glitchPass = new GlitchPass();
+
 composer.addPass(renderPass, shaders)
 
 // Sun
@@ -110,7 +114,7 @@ function animate() {
   NeptuneComponent.rotation.y += 0.004
 
   let { x, z, y } = MoonComponent.position
-  const angle = 0.005
+  const angle = 0.0054
   const holdX = x
 
   // X axis rotation
@@ -124,7 +128,7 @@ function animate() {
   MoonComponent.position.y = y
   MoonComponent.position.z = z
 
-  MoonComponent.rotation.y += 0.0005
+  MoonComponent.rotation.y -= 0.005
 
   SunComponent[0].rotation.y += 0.0005
   

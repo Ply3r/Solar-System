@@ -5,6 +5,8 @@ const Moon = () => {
   const geometrical = new THREE.SphereGeometry(3, 60, 30)
   const material = new THREE.MeshStandardMaterial({ map: moonTexture })
   const moon = new THREE.Mesh(geometrical, material)
+  moon.castShadow = true
+  moon.receiveShadow = true
 
   moon.position.x = 25
   moon.position.y = 5
