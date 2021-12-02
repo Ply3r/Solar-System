@@ -14,7 +14,7 @@ import Planets from './components/Planets.js';
 const scene = new THREE.Scene()
 const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000)
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector("#canvas") })
-camera.position.z = 40
+camera.position.z = 50
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.shadowMap.enabled = true;
@@ -115,11 +115,11 @@ function animate() {
   const angle = 0.0054
   const holdX = x
 
-  // X axis rotation
+  // X axis rotation moon
   x = x * Math.cos(angle) - z * Math.sin(angle)
   z = z * Math.cos(angle) + holdX * Math.sin(angle)
 
-  // Y axis rotation
+  // Y axis rotation moon
   y = y * Math.cos(0.0009) - z * Math.sin(0.0009)
 
   MoonComponent.position.x = x
@@ -129,6 +129,25 @@ function animate() {
   MoonComponent.rotation.y -= 0.005
 
   SunComponent[0].rotation.y += 0.0005
+
+  // camera
+  let { x: camX, y : camY, z: camZ } = camera.position
+
+  const xAngle = 0.003;
+  const yAngle = 0.0005;
+
+  const holdCamX = camX;
+
+  // X axis rotation camera
+  camX = camX * Math.cos(xAngle) + camZ * Math.sin(xAngle)
+  camZ = camZ * Math.cos(xAngle) - holdCamX * Math.sin(xAngle)
+
+  // Y axis rotation camera
+  camY = camY * Math.cos(yAngle) + camZ * Math.sin(yAngle)
+
+  camera.position.x = camX
+  camera.position.y = camY
+  camera.position.z = camZ
   
   controls.update()
   composer.render()
