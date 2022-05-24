@@ -8,6 +8,8 @@ const Earth = () => {
   earth.castShadow = true
   earth.receiveShadow = true
 
+  earth.position.x = -300
+
   return earth
 }
 

@@ -5,16 +5,18 @@ import { RenderPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/p
 import { PCFSoftShadowMap } from 'https://cdn.skypack.dev/three@0.135.0/build/three.module.js';
 import { ShaderPass } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/postprocessing/ShaderPass.js';
 import { FXAAShader } from 'https://cdn.skypack.dev/three@0.135.0/examples/jsm/shaders/FXAAShader.js';
-import Sun from './components/Sum.js';
+import Sun from './components/Sun.js';
 import Earth from './components/Earth.js';
 import Moon from './components/Moon.js';
-import Planets from './components/Planets.js';
+import Planet from './components/Planets.js';
+import { orbitMovement, rotationMovement } from './utils/celestialMovements.js';
 
 // INITIAL SETUP
 const scene = new THREE.Scene()
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth/window.innerHeight, 0.1, 1000)
+const camera = new THREE.PerspectiveCamera(90, window.innerWidth/window.innerHeight, 0.1, 1000)
 const renderer = new THREE.WebGLRenderer({ canvas: document.querySelector("#canvas") })
-camera.position.z = 50
+camera.position.z = 200
+camera.position.y = 50
 renderer.setPixelRatio(window.devicePixelRatio)
 renderer.setSize(window.innerWidth, window.innerHeight)
 renderer.shadowMap.enabled = true;
@@ -33,47 +35,35 @@ const SunComponent = Sun()
 scene.add(...SunComponent)
 
 // Mercury
-const MercuryComponent = Planets('mercury', [7, 60, 30], 200)
+const MercuryComponent = Planet('mercury', [7, 60, 30], -150)
 scene.add(MercuryComponent)
 
 // Venus
-const VenusComponent = Planets('venus', [11, 60, 30], 100)
+const VenusComponent = Planet('venus', [11, 60, 30], -200)
 scene.add(VenusComponent)
 
 // Earth
 const EarthComponent = Earth()
 scene.add(EarthComponent)
 
-// Moon
-const MoonComponent = Moon()
-scene.add(MoonComponent)
-
 // Mars
-const MarsComponent = Planets('mars', [12, 60, 30], -100)
+const MarsComponent = Planet('mars', [12, 60, 30], -400)
 scene.add(MarsComponent)
 
 // Jupiter
-const JupiterComponent = Planets('jupiter', [20, 60, 30], -200)
+const JupiterComponent = Planet('jupiter', [20, 60, 30], -500)
 scene.add(JupiterComponent)
 
 // Saturn
-const SaturnComponent = Planets('saturn', [18, 60, 30], -300)
+const SaturnComponent = Planet('saturn', [18, 60, 30], -600)
 scene.add(SaturnComponent)
 
-// Saturn_Ring 
-const SaturnShape = new THREE.TorusGeometry(30, 5, 2, 100)
-const material = new THREE.MeshStandardMaterial({ color: 0xE6BB7D })
-const saturnRing = new THREE.Mesh(SaturnShape, material)
-saturnRing.rotation.x = 90
-saturnRing.position.x = -300
-scene.add(saturnRing)
-
 // Uranus
-const UranusComponent = Planets('uranus', [16, 60, 30], -400)
+const UranusComponent = Planet('uranus', [16, 60, 30], -700)
 scene.add(UranusComponent)
 
 // Neptune
-const NeptuneComponent = Planets('neptune', [18, 60, 30], -500)
+const NeptuneComponent = Planet('neptune', [18, 60, 30], -800)
 scene.add(NeptuneComponent)
 
 // Ambient Light
@@ -101,53 +91,59 @@ const addStars = () => {
 function animate() {
   requestAnimationFrame( animate )
   
-  MercuryComponent.rotation.y += 0.009
-  VenusComponent.rotation.y += 0.0005
-  EarthComponent.rotation.y += 0.001
-  MarsComponent.rotation.y += 0.001
-  JupiterComponent.rotation.y += 0.005
-  SaturnComponent.rotation.y += 0.005
-  saturnRing.rotation.z += 0.005
-  UranusComponent.rotation.y += 0.004
-  NeptuneComponent.rotation.y += 0.004
+  rotationMovement(MercuryComponent)(0.009);
+  rotationMovement(VenusComponent)(0.0005);
+  rotationMovement(EarthComponent)(0.001);
+  rotationMovement(MarsComponent)(0.001);
+  rotationMovement(JupiterComponent)(0.005);
+  rotationMovement(SaturnComponent)(0.005);
+  rotationMovement(UranusComponent)(0.004);
+  rotationMovement(NeptuneComponent)(0.004);
+  rotationMovement(SunComponent[0])(0.0005);
 
-  let { x, z, y } = MoonComponent.position
-  const angle = 0.0054
-  const holdX = x
+  // orbit movement from moon
+  const angleXMoon = 0.0099;
+  const angleYMoon = 0.00099;
 
-  // X axis rotation moon
-  x = x * Math.cos(angle) - z * Math.sin(angle)
-  z = z * Math.cos(angle) + holdX * Math.sin(angle)
+  orbitMovement(MercuryComponent)({ 
+    angleX: angleXMoon * .98, 
+    angleY: angleYMoon * .98
+  });
 
-  // Y axis rotation moon
-  y = y * Math.cos(0.0009) - z * Math.sin(0.0009)
+  orbitMovement(VenusComponent)({ 
+    angleX: angleXMoon * .88, 
+    angleY: angleYMoon * .88
+  });
 
-  MoonComponent.position.x = x
-  MoonComponent.position.y = y
-  MoonComponent.position.z = z
+  orbitMovement(EarthComponent)({ 
+    angleX: angleXMoon * .78, 
+    angleY: angleYMoon * .78
+  });
 
-  MoonComponent.rotation.y -= 0.005
+  orbitMovement(MarsComponent)({ 
+    angleX: angleXMoon * .76, 
+    angleY: angleYMoon * .76
+  });
 
-  SunComponent[0].rotation.y += 0.0005
+  orbitMovement(JupiterComponent)({ 
+    angleX: angleXMoon * .40, 
+    angleY: angleYMoon * .40
+  });
 
-  // camera
-  let { x: camX, y : camY, z: camZ } = camera.position
+  orbitMovement(SaturnComponent)({ 
+    angleX: angleXMoon * .38, 
+    angleY: angleYMoon * .38
+  });
 
-  const xAngle = 0.003;
-  const yAngle = 0.0005;
+  orbitMovement(UranusComponent)({ 
+    angleX: angleXMoon, 
+    angleY: angleYMoon
+  });
 
-  const holdCamX = camX;
-
-  // X axis rotation camera
-  camX = camX * Math.cos(xAngle) + camZ * Math.sin(xAngle)
-  camZ = camZ * Math.cos(xAngle) - holdCamX * Math.sin(xAngle)
-
-  // Y axis rotation camera
-  camY = camY * Math.cos(yAngle) + camZ * Math.sin(yAngle)
-
-  camera.position.x = camX
-  camera.position.y = camY
-  camera.position.z = camZ
+  orbitMovement(NeptuneComponent)({ 
+    angleX: angleXMoon, 
+    angleY: angleYMoon
+  });
   
   controls.update()
   composer.render()

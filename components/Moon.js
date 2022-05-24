@@ -8,7 +8,7 @@ const Moon = () => {
   moon.castShadow = true
   moon.receiveShadow = true
 
-  moon.position.x = 25
+  moon.position.x = -325
   moon.position.y = 5
   moon.position.z = 0
 

@@ -5,10 +5,10 @@ const Sun = () => {
   const geometrical = new THREE.SphereGeometry(60, 60, 30)
   const material = new THREE.MeshBasicMaterial({ map: sunTexture })
   const sun = new THREE.Mesh(geometrical, material)
-  sun.position.x = 300 
+  sun.position.x = 0 
 
   const sunLight = new THREE.PointLight(0xffffff, 1, 0, 2)
-  sunLight.position.set(300, 5, 5)
+  sunLight.position.set(0, 5, 5)
   sunLight.castShadow = true;
 
   return [sun, sunLight]
