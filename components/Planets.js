@@ -1,14 +1,15 @@
-import * as THREE from 'https://cdn.skypack.dev/three@0.135.0';
+import * as THREE from 'three'
 
-const Planets = (name, geometria, positon) => {
-  const PlanetsTexture = new THREE.TextureLoader().load(`./images/${name}.jpg`)
-  const geometrical = new THREE.SphereGeometry(...geometria)
-  const material = new THREE.MeshStandardMaterial({ map: PlanetsTexture })
-  const Planets = new THREE.Mesh(geometrical, material)
-  Planets.castShadow = false
-  Planets.position.x = positon
+const Planets = (name, geometry, positionX) => {
+  const texture = new THREE.TextureLoader().load(`./images/${name}.jpg`)
+  const sphere = new THREE.SphereGeometry(...geometry)
+  const material = new THREE.MeshStandardMaterial({ map: texture })
+  const planet = new THREE.Mesh(sphere, material)
+  planet.castShadow = true
+  planet.receiveShadow = true
+  planet.position.x = positionX
 
-  return Planets
+  return planet
 }
 
 export default Planets
