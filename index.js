@@ -56,16 +56,16 @@ const [sun, sunLight] = Sun();
 scene.add(sun, sunLight);
 
 // Orbitas: cada corpo fica em um pivo na origem (Sol); girar o pivo = orbitar o Sol.
-// [name, [radius, widthSegments, heightSegments], distance to Sun, orbit speed (rad/s), spin (rad/s), orbit color]
+// [name, [radius, widthSegments, heightSegments], distance to Sun, orbit speed (rad/s), spin (rad/s), trail color, start angle (rad)]
 const planetData = [
-  ["mercury", [7, 60, 30], 100, 0.24, 0.54, 0xb1b1b1],
-  ["venus", [11, 60, 30], 200, 0.18, 0.03, 0xe6c27a],
-  ["earth", [15, 60, 30], 300, 0.12, 0.06, 0x4aa3ff],
-  ["mars", [12, 60, 30], 400, 0.09, 0.06, 0xe0573a],
-  ["jupiter", [20, 60, 30], 500, 0.05, 0.3, 0xd9a066],
-  ["saturn", [18, 60, 30], 600, 0.035, 0.3, 0xe6d28a],
-  ["uranus", [16, 60, 30], 700, 0.025, 0.24, 0x7fe0e6],
-  ["neptune", [18, 60, 30], 800, 0.02, 0.24, 0x4a6cf0],
+  ["mercury", [7, 60, 30], 100, 0.24, 0.54, 0xb1b1b1, 0.5],
+  ["venus", [11, 60, 30], 200, 0.18, 0.03, 0xe6c27a, 2.4],
+  ["earth", [15, 60, 30], 300, 0.12, 0.06, 0x4aa3ff, 4.0],
+  ["mars", [12, 60, 30], 400, 0.09, 0.06, 0xe0573a, 1.2],
+  ["jupiter", [20, 60, 30], 500, 0.05, 0.3, 0xd9a066, 5.3],
+  ["saturn", [18, 60, 30], 600, 0.035, 0.3, 0xe6d28a, 3.1],
+  ["uranus", [16, 60, 30], 700, 0.025, 0.24, 0x7fe0e6, 0.2],
+  ["neptune", [18, 60, 30], 800, 0.02, 0.24, 0x4a6cf0, 4.6],
 ];
 
 // Rastro: linha que vai sendo desenhada atras do corpo e some aos poucos.
@@ -118,8 +118,9 @@ const createTrail = (color, orbitSpeed, parent = scene) => {
   };
 };
 
-const planets = planetData.map(([name, geometry, distance, orbitSpeed, spin, color]) => {
+const planets = planetData.map(([name, geometry, distance, orbitSpeed, spin, color, startAngle]) => {
   const pivot = new THREE.Group();
+  pivot.rotation.y = startAngle;
   scene.add(pivot);
 
   const mesh = name === "earth" ? Earth() : Planets(name, geometry, distance);
