@@ -20,7 +20,7 @@ const camera = new THREE.PerspectiveCamera(
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector("#canvas"),
 });
-camera.position.z = 50;
+camera.position.set(0, 500, 1300);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
@@ -55,49 +55,72 @@ resize();
 const [sun, sunLight] = Sun();
 scene.add(sun, sunLight);
 
-// Earth + Moon
-const earth = Earth();
-scene.add(earth);
-
-const { tilt: moonTilt, orbit: moonOrbit, moon } = Moon();
-scene.add(moonTilt);
-
-// Other planets: [name, [radius, widthSegments, heightSegments], x, spin (rad/s)]
+// Orbitas: cada corpo fica em um pivo na origem (Sol); girar o pivo = orbitar o Sol.
+// [name, [radius, widthSegments, heightSegments], distance to Sun, orbit speed (rad/s), spin (rad/s)]
 const planetData = [
-  ["mercury", [7, 60, 30], 200, 0.54],
-  ["venus", [11, 60, 30], 100, 0.03],
-  ["mars", [12, 60, 30], -100, 0.06],
-  ["jupiter", [20, 60, 30], -200, 0.3],
-  ["saturn", [18, 60, 30], -300, 0.3],
-  ["uranus", [16, 60, 30], -400, 0.24],
-  ["neptune", [18, 60, 30], -500, 0.24],
+  ["mercury", [7, 60, 30], 100, 0.24, 0.54],
+  ["venus", [11, 60, 30], 200, 0.18, 0.03],
+  ["earth", [15, 60, 30], 300, 0.12, 0.06],
+  ["mars", [12, 60, 30], 400, 0.09, 0.06],
+  ["jupiter", [20, 60, 30], 500, 0.05, 0.3],
+  ["saturn", [18, 60, 30], 600, 0.035, 0.3],
+  ["uranus", [16, 60, 30], 700, 0.025, 0.24],
+  ["neptune", [18, 60, 30], 800, 0.02, 0.24],
 ];
-const planets = planetData.map(([name, geometry, x, spin]) => {
-  const mesh = Planets(name, geometry, x);
-  scene.add(mesh);
-  return { mesh, spin };
+
+const addOrbitLine = (radius) => {
+  const points = [];
+  for (let i = 0; i <= 128; i += 1) {
+    const angle = (i / 128) * Math.PI * 2;
+    points.push(new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius));
+  }
+  const line = new THREE.LineLoop(
+    new THREE.BufferGeometry().setFromPoints(points),
+    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 }),
+  );
+  scene.add(line);
+};
+
+const planets = planetData.map(([name, geometry, distance, orbitSpeed, spin]) => {
+  const pivot = new THREE.Group();
+  scene.add(pivot);
+  addOrbitLine(distance);
+
+  const mesh = name === "earth" ? Earth() : Planets(name, geometry, distance);
+  mesh.position.x = distance;
+  pivot.add(mesh);
+  return { name, pivot, mesh, orbitSpeed, spin };
 });
 
-// Saturn ring
+// Moon: filha do pivo da Terra, entao acompanha a Terra e orbita ela
+const earthEntry = planets.find(({ name }) => name === "earth");
+const { tilt: moonTilt, orbit: moonOrbit, moon } = Moon();
+moonTilt.position.x = 300;
+earthEntry.pivot.add(moonTilt);
+
+// Saturn ring: tambem no pivo, acompanhando Saturno
+const saturnEntry = planets.find(({ name }) => name === "saturn");
 const saturnRing = new THREE.Mesh(
   new THREE.TorusGeometry(30, 5, 2, 100),
   new THREE.MeshStandardMaterial({ color: 0xe6bb7d }),
 );
 saturnRing.rotation.x = Math.PI / 2 - 0.4;
-saturnRing.position.x = -300;
+saturnRing.position.x = 600;
 saturnRing.castShadow = true;
 saturnRing.receiveShadow = true;
-scene.add(saturnRing);
+saturnEntry.pivot.add(saturnRing);
 
 // Ambient Light
 scene.add(new THREE.AmbientLight(0xffffff, 0.1));
 
-// Camera: gira em volta da Terra (alvo na origem); sem pan, zoom com a roda
+// Camera: gira em volta do Sol (alvo na origem); sem pan, zoom com a roda
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
 controls.enableRotate = true;
 controls.enablePan = false;
 controls.enableDamping = true;
+controls.minDistance = 150;
+controls.maxDistance = 3000;
 
 // Stars: um unico draw call, centradas na origem e dentro do alcance da camera
 const addStars = () => {
@@ -123,8 +146,8 @@ function animate() {
   requestAnimationFrame(animate);
   const dt = clock.getDelta();
 
-  earth.rotation.y += 0.06 * dt;
-  planets.forEach(({ mesh, spin }) => {
+  planets.forEach(({ pivot, mesh, orbitSpeed, spin }) => {
+    pivot.rotation.y += orbitSpeed * dt;
     mesh.rotation.y += spin * dt;
   });
   saturnRing.rotation.z += 0.3 * dt;
