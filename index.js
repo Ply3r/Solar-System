@@ -15,7 +15,7 @@ const camera = new THREE.PerspectiveCamera(
   70,
   window.innerWidth / window.innerHeight,
   0.1,
-  5000,
+  10000,
 );
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector("#canvas"),
@@ -162,22 +162,47 @@ controls.enableDamping = true;
 controls.minDistance = 100;
 controls.maxDistance = 3000;
 
-// Stars: um unico draw call, centradas na origem e dentro do alcance da camera
-const addStars = () => {
-  const count = 1500;
-  const range = 3000;
+// Stars: 3 camadas em cascas esfericas distantes, cada uma acompanhando a camera
+// em um grau (follow). Mais longe = acompanha mais = parece mais parada (parallax).
+const starLayers = [
+  { count: 800, radius: 4000, follow: 0.95, size: 1.5, opacity: 0.6 },
+  { count: 500, radius: 3000, follow: 0.85, size: 2, opacity: 0.8 },
+  { count: 200, radius: 2200, follow: 0.7, size: 2.5, opacity: 1 },
+].map(({ count, radius, follow, size, opacity }) => {
   const positions = new Float32Array(count * 3);
-  for (let i = 0; i < positions.length; i += 1) {
-    positions[i] = (Math.random() - 0.5) * range;
+  const direction = new THREE.Vector3();
+  for (let i = 0; i < count; i += 1) {
+    do {
+      direction.set(
+        Math.random() * 2 - 1,
+        Math.random() * 2 - 1,
+        Math.random() * 2 - 1,
+      );
+    } while (direction.lengthSq() > 1 || direction.lengthSq() < 0.01);
+    direction.normalize().multiplyScalar(radius).toArray(positions, i * 3);
   }
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-  const material = new THREE.PointsMaterial({
-    color: 0xffffff,
-    size: 2,
-    sizeAttenuation: false,
+  const stars = new THREE.Points(
+    geometry,
+    new THREE.PointsMaterial({
+      color: 0xffffff,
+      size,
+      sizeAttenuation: false,
+      transparent: true,
+      opacity,
+      depthWrite: false,
+    }),
+  );
+  stars.frustumCulled = false;
+  scene.add(stars);
+  return { stars, follow };
+});
+
+const updateStars = () => {
+  starLayers.forEach(({ stars, follow }) => {
+    stars.position.copy(camera.position).multiplyScalar(follow);
   });
-  scene.add(new THREE.Points(geometry, material));
 };
 
 const clock = new THREE.Clock();
@@ -200,8 +225,8 @@ function animate() {
   sun.rotation.y += 0.03 * dt;
 
   controls.update();
+  updateStars();
   composer.render();
 }
 
-addStars();
 animate();
