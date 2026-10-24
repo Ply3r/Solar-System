@@ -92,10 +92,10 @@ scene.add(saturnRing);
 // Ambient Light
 scene.add(new THREE.AmbientLight(0xffffff, 0.1));
 
-// Camera: fixa na Terra (alvo na origem), sem rotacao nem pan; so zoom com a roda
+// Camera: gira em volta da Terra (alvo na origem); sem pan, zoom com a roda
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
-controls.enableRotate = false;
+controls.enableRotate = true;
 controls.enablePan = false;
 controls.enableDamping = true;
 
