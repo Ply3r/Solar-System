@@ -68,28 +68,65 @@ const planetData = [
   ["neptune", [18, 60, 30], 800, 0.02, 0.24, 0x4a6cf0],
 ];
 
-const addOrbitLine = (radius, color, parent = scene) => {
-  const points = [];
-  for (let i = 0; i <= 128; i += 1) {
-    const angle = (i / 128) * Math.PI * 2;
-    points.push(new THREE.Vector3(Math.cos(angle) * radius, 0, Math.sin(angle) * radius));
-  }
-  const line = new THREE.LineLoop(
-    new THREE.BufferGeometry().setFromPoints(points),
-    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.7 }),
+// Rastro: linha que vai sendo desenhada atras do corpo e some aos poucos.
+// Cobre sempre ~2.2 rad da orbita, independente da velocidade do corpo.
+const TRAIL_POINTS = 120;
+const TRAIL_ANGLE = 2.2;
+
+const createTrail = (color, orbitSpeed, parent = scene) => {
+  const base = new THREE.Color(color);
+  const positions = new Float32Array(TRAIL_POINTS * 3);
+  const colors = new Float32Array(TRAIL_POINTS * 3);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  geometry.setDrawRange(0, 0);
+  const line = new THREE.Line(
+    geometry,
+    new THREE.LineBasicMaterial({
+      vertexColors: true,
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+    }),
   );
+  line.frustumCulled = false;
   parent.add(line);
+
+  const points = [];
+  const interval = TRAIL_ANGLE / (TRAIL_POINTS * orbitSpeed);
+  let elapsed = 0;
+
+  return (position, dt) => {
+    elapsed += dt;
+    if (elapsed < interval) return;
+    elapsed %= interval;
+
+    points.push(position.clone());
+    if (points.length > TRAIL_POINTS) points.shift();
+
+    points.forEach((point, i) => {
+      const fade = ((i + 1) / points.length) ** 1.5;
+      point.toArray(positions, i * 3);
+      colors[i * 3] = base.r * fade;
+      colors[i * 3 + 1] = base.g * fade;
+      colors[i * 3 + 2] = base.b * fade;
+    });
+    geometry.setDrawRange(0, points.length);
+    geometry.attributes.position.needsUpdate = true;
+    geometry.attributes.color.needsUpdate = true;
+  };
 };
 
 const planets = planetData.map(([name, geometry, distance, orbitSpeed, spin, color]) => {
   const pivot = new THREE.Group();
   scene.add(pivot);
-  addOrbitLine(distance, color);
 
   const mesh = name === "earth" ? Earth() : Planets(name, geometry, distance);
   mesh.position.x = distance;
   pivot.add(mesh);
-  return { name, pivot, mesh, orbitSpeed, spin };
+  const updateTrail = createTrail(color, orbitSpeed);
+  return { name, pivot, mesh, orbitSpeed, spin, updateTrail };
 });
 
 // Moon: filha do pivo da Terra, entao acompanha a Terra e orbita ela
@@ -97,7 +134,9 @@ const earthEntry = planets.find(({ name }) => name === "earth");
 const { tilt: moonTilt, orbit: moonOrbit, moon } = Moon();
 moonTilt.position.x = 300;
 earthEntry.pivot.add(moonTilt);
-addOrbitLine(25, 0xcccccc, moonTilt);
+const updateMoonTrail = createTrail(0xcccccc, 0.324, moonTilt);
+const moonLocal = new THREE.Vector3();
+const planetWorld = new THREE.Vector3();
 
 // Saturn ring: tambem no pivo, acompanhando Saturno
 const saturnEntry = planets.find(({ name }) => name === "saturn");
@@ -147,14 +186,16 @@ function animate() {
   requestAnimationFrame(animate);
   const dt = clock.getDelta();
 
-  planets.forEach(({ pivot, mesh, orbitSpeed, spin }) => {
+  planets.forEach(({ pivot, mesh, orbitSpeed, spin, updateTrail }) => {
     pivot.rotation.y += orbitSpeed * dt;
     mesh.rotation.y += spin * dt;
+    updateTrail(mesh.getWorldPosition(planetWorld), dt);
   });
   saturnRing.rotation.z += 0.3 * dt;
 
   moonOrbit.rotation.y += 0.324 * dt;
   moon.rotation.y -= 0.3 * dt;
+  updateMoonTrail(moonLocal.copy(moon.position).applyQuaternion(moonOrbit.quaternion), dt);
 
   sun.rotation.y += 0.03 * dt;
 
