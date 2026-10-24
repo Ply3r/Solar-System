@@ -92,16 +92,12 @@ scene.add(saturnRing);
 // Ambient Light
 scene.add(new THREE.AmbientLight(0xffffff, 0.1));
 
-// Camera: sem rotacao; pan com o botao esquerdo/direito, zoom com a roda
+// Camera: fixa na Terra (alvo na origem), sem rotacao nem pan; so zoom com a roda
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(0, 0, 0);
 controls.enableRotate = false;
+controls.enablePan = false;
 controls.enableDamping = true;
-controls.mouseButtons = {
-  LEFT: THREE.MOUSE.PAN,
-  MIDDLE: THREE.MOUSE.DOLLY,
-  RIGHT: THREE.MOUSE.PAN,
-};
-controls.touches = { ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN };
 
 // Stars: um unico draw call, centradas na origem e dentro do alcance da camera
 const addStars = () => {
