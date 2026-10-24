@@ -20,7 +20,7 @@ const camera = new THREE.PerspectiveCamera(
 const renderer = new THREE.WebGLRenderer({
   canvas: document.querySelector("#canvas"),
 });
-camera.position.set(0, 500, 1300);
+camera.position.set(0, 200, 380);
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
@@ -56,19 +56,19 @@ const [sun, sunLight] = Sun();
 scene.add(sun, sunLight);
 
 // Orbitas: cada corpo fica em um pivo na origem (Sol); girar o pivo = orbitar o Sol.
-// [name, [radius, widthSegments, heightSegments], distance to Sun, orbit speed (rad/s), spin (rad/s)]
+// [name, [radius, widthSegments, heightSegments], distance to Sun, orbit speed (rad/s), spin (rad/s), orbit color]
 const planetData = [
-  ["mercury", [7, 60, 30], 100, 0.24, 0.54],
-  ["venus", [11, 60, 30], 200, 0.18, 0.03],
-  ["earth", [15, 60, 30], 300, 0.12, 0.06],
-  ["mars", [12, 60, 30], 400, 0.09, 0.06],
-  ["jupiter", [20, 60, 30], 500, 0.05, 0.3],
-  ["saturn", [18, 60, 30], 600, 0.035, 0.3],
-  ["uranus", [16, 60, 30], 700, 0.025, 0.24],
-  ["neptune", [18, 60, 30], 800, 0.02, 0.24],
+  ["mercury", [7, 60, 30], 100, 0.24, 0.54, 0xb1b1b1],
+  ["venus", [11, 60, 30], 200, 0.18, 0.03, 0xe6c27a],
+  ["earth", [15, 60, 30], 300, 0.12, 0.06, 0x4aa3ff],
+  ["mars", [12, 60, 30], 400, 0.09, 0.06, 0xe0573a],
+  ["jupiter", [20, 60, 30], 500, 0.05, 0.3, 0xd9a066],
+  ["saturn", [18, 60, 30], 600, 0.035, 0.3, 0xe6d28a],
+  ["uranus", [16, 60, 30], 700, 0.025, 0.24, 0x7fe0e6],
+  ["neptune", [18, 60, 30], 800, 0.02, 0.24, 0x4a6cf0],
 ];
 
-const addOrbitLine = (radius) => {
+const addOrbitLine = (radius, color, parent = scene) => {
   const points = [];
   for (let i = 0; i <= 128; i += 1) {
     const angle = (i / 128) * Math.PI * 2;
@@ -76,15 +76,15 @@ const addOrbitLine = (radius) => {
   }
   const line = new THREE.LineLoop(
     new THREE.BufferGeometry().setFromPoints(points),
-    new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.15 }),
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.7 }),
   );
-  scene.add(line);
+  parent.add(line);
 };
 
-const planets = planetData.map(([name, geometry, distance, orbitSpeed, spin]) => {
+const planets = planetData.map(([name, geometry, distance, orbitSpeed, spin, color]) => {
   const pivot = new THREE.Group();
   scene.add(pivot);
-  addOrbitLine(distance);
+  addOrbitLine(distance, color);
 
   const mesh = name === "earth" ? Earth() : Planets(name, geometry, distance);
   mesh.position.x = distance;
@@ -97,6 +97,7 @@ const earthEntry = planets.find(({ name }) => name === "earth");
 const { tilt: moonTilt, orbit: moonOrbit, moon } = Moon();
 moonTilt.position.x = 300;
 earthEntry.pivot.add(moonTilt);
+addOrbitLine(25, 0xcccccc, moonTilt);
 
 // Saturn ring: tambem no pivo, acompanhando Saturno
 const saturnEntry = planets.find(({ name }) => name === "saturn");
@@ -119,7 +120,7 @@ controls.target.set(0, 0, 0);
 controls.enableRotate = true;
 controls.enablePan = false;
 controls.enableDamping = true;
-controls.minDistance = 150;
+controls.minDistance = 100;
 controls.maxDistance = 3000;
 
 // Stars: um unico draw call, centradas na origem e dentro do alcance da camera
